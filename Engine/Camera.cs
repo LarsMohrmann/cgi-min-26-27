@@ -2,7 +2,7 @@ using OpenTK.Mathematics;
 
 namespace Engine;
 
-// Eine Kamera beschreibt nur eine Ansicht; sie besitzt keinen OpenGL-Zustand.
+// A camera only describes a view; it has no OpenGL state.
 public sealed class Camera
 {
     public Vector3 Position { get; private set; }

@@ -12,6 +12,6 @@ out vec2 uv;
 void main()
 {
     uv = texCoord;
-    // OpenTK verwendet Zeilenvektoren; die Matrizen werden entsprechend geladen.
+    // OpenTK uses row vectors; the matrices are uploaded accordingly.
     gl_Position = vec4(localPosition, 1.0) * uModel * uView * uProjection;
 }

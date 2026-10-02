@@ -1,76 +1,76 @@
 # CGI-MIN 26/27
 
-Kleiner Startpunkt für Computergrafik mit C# und OpenTK: Ein rotierender,
-texturierter Würfel ohne Beleuchtung. Ein Phong-Material mit Ambient-, Diffuse-
-und Specular-Beleuchtung liegt ebenfalls in der Engine.
+A small starting point for computer graphics with C# and OpenTK: a rotating,
+textured model without lighting. The engine also contains a wave distortion
+material and a Phong material with ambient, diffuse and specular lighting.
 
-## Aufbau
+## Structure
 
-- `Engine/Application.cs` ist die Basisklasse für ein Programm. Sie trennt Logik
-  und Zeichnen ähnlich wie Unity (siehe unten).
-- `Engine/Camera.cs` beschreibt eine Ansicht über Position, Blickpunkt und
-  Projektion. Mehrere Kamerainstanzen können unabhängig voneinander existieren.
-- `Engine/Materials/` enthält die abstrakte Basis `Material` und pro Materialtyp
-  einen Unterordner mit Klasse und GLSL-Dateien: `UnlitTexture/` (Textur ohne
-  Licht), `WaveDistortion/` (Textur ohne Licht, Vertices per Sinuswelle verschoben;
-  die Phase `Wobble` wird in `Update` erhöht) und `Phong/` (einfarbig mit Beleuchtung). Die Shader werden als `EmbeddedResource`
-  in die `Engine.dll` eingebettet.
-- `Engine/Geometry/` enthält Geometrie im Hauptspeicher ohne OpenGL: `Vertex`
-  (Position, Normale, Texturkoordinate), `MeshData` (Vertices und Dreiecksindizes)
-  und `Primitives` (z. B. `CreateCube()`). `Loaders/ObjLoader` liest die Geometrie
-  aus Wavefront-.obj-Dateien (`v`, `vt`, `vn`, `f`, auch Polygone und Faces ohne UVs
-  oder Normalen) und liefert ebenfalls `MeshData`; `.mtl`-Dateien werden ignoriert.
-- `Engine/OpenGL/` enthält `Mesh` (Vertex- und Indexbuffer auf der GPU),
-  `Texture` (Bild als RGBA-Textur, geladen mit StbImageSharp),
-  `ShaderSource` (woher ein Shader kommt), `ShaderProgram` (GLSL-Kompilierung und Uniforms) und `OpenGlRenderer`
-  (OpenGL-Zustand, Shader-Verwaltung und Draw-Aufruf).
-- `Example/` ist die ausführbare OpenTK-Anwendung und referenziert `Engine`.
-  Bilder und andere Dateien in `Example/Assets/` werden beim Build neben die
-  Anwendung kopiert; die Textur wird aus `Assets/wood_box.png` geladen.
-- `CgiMin.sln` lädt beide Projekte zusammen.
+- `Engine/Application.cs` is the base class for a program. It separates logic
+  and drawing, similar to Unity (see below).
+- `Engine/Camera.cs` describes a view by position, target and projection.
+  Multiple camera instances can exist independently of each other.
+- `Engine/Materials/` contains the abstract base class `Material` and one
+  subfolder per material type with its class and GLSL files: `UnlitTexture/`
+  (texture without lighting), `WaveDistortion/` (texture without lighting,
+  vertices displaced by a sine wave; the phase `Wobble` is increased in `Update`)
+  and `Phong/` (single color with lighting). The shaders are embedded into
+  `Engine.dll` as `EmbeddedResource`.
+- `Engine/Geometry/` contains geometry in main memory, without OpenGL: `Vertex`
+  (position, normal, texture coordinate), `MeshData` (vertices and triangle
+  indices) and `Primitives` (e.g. `CreateCube()`). `Loaders/ObjLoader` reads the
+  geometry from Wavefront .obj files (`v`, `vt`, `vn`, `f`, including polygons and
+  faces without UVs or normals) and also returns `MeshData`; `.mtl` files are ignored.
+- `Engine/OpenGL/` contains `Mesh` (vertex and index buffer on the GPU),
+  `Texture` (image as RGBA texture, loaded with StbImageSharp), `ShaderSource`
+  (where a shader comes from), `ShaderProgram` (GLSL compilation and uniforms) and
+  `OpenGlRenderer` (OpenGL state, shader management and draw call).
+- `Example/` is the executable OpenTK application and references `Engine`.
+  Images and other files in `Example/Assets/` are copied next to the application
+  during the build; the texture is loaded from `Assets/wood_box.png`.
+- `CgiMin.sln` loads both projects together.
 
-Das Example lädt den Stern aus `Assets/star.obj` mit `ObjLoader` (alternativ, auskommentiert,
-den Würfel aus `Primitives.CreateCube()`) und zeichnet ihn mit
-`renderer.Draw(mesh, material, modelMatrix, camera)`. Die Animation ändert nur
-die Modellmatrix; die Kamera ist keine globale statische Klasse. Material und
-Kamera zeichnen nicht selbst. Ein Szenenmodell kommt erst in einem späteren Schritt.
+The example loads the star from `Assets/star.obj` with `ObjLoader` (alternatively,
+commented out, the cube from `Primitives.CreateCube()`) and draws it with
+`renderer.Draw(mesh, material, modelMatrix, camera)`. The animation only changes
+the model matrix; the camera is not a global static class. Materials and cameras
+do not draw themselves. A scene model will follow in a later step.
 
-Ein Material hält nur Oberflächenwerte und verweist auf seine `ShaderSource`.
-Texturen referenziert es nur; freigeben muss sie, wer sie erzeugt hat.
-Der Renderer kompiliert jeden Material-Shader beim ersten `Draw` einmal und gibt
-ihn in `Dispose` frei. Jeder Material-Shader muss `uModel`, `uView` und
-`uProjection` verwenden; `uCameraPosition` und `uLightPosition` sind optional.
+A material only holds surface values and refers to its `ShaderSource`. It only
+references textures; whoever created a texture has to dispose of it. The renderer
+compiles each material shader once on the first `Draw` and releases it in
+`Dispose`. Every material shader must use `uModel`, `uView` and `uProjection`;
+`uCameraPosition` and `uLightPosition` are optional.
 
-## Ablauf eines Frames
+## Frame sequence
 
-Ein Programm erbt von `Engine.Application` und überschreibt nur diese Methoden:
+A program derives from `Engine.Application` and only overrides these methods:
 
-| Methode | Wann | Wofür |
+| Method | When | What for |
 |---|---|---|
-| `Initialize()` | einmal beim Start | Renderer, Meshes, Materialien anlegen |
-| `FramebufferResized(width, height)` | nach `Initialize` und bei Größenänderung | Viewport anpassen |
-| `FixedUpdate(fixedDeltaTime)` | 0…n-mal pro Frame, feste Schrittweite `FixedDeltaTime` (Standard 1/50 s) | Physik, Simulation |
-| `Update(deltaTime)` | einmal pro Frame | Animation, Eingabe, Spiellogik |
-| `Render()` | einmal pro Frame, nach `Update` | nur zeichnen |
-| `Shutdown()` | einmal beim Beenden | GPU-Ressourcen freigeben |
+| `Initialize()` | once at startup | create renderer, meshes, materials |
+| `FramebufferResized(width, height)` | after `Initialize` and on resize | adjust the viewport |
+| `FixedUpdate(fixedDeltaTime)` | 0…n times per frame, fixed time step `FixedDeltaTime` (default 1/50 s) | physics, simulation |
+| `Update(deltaTime)` | once per frame | animation, input, game logic |
+| `Render()` | once per frame, after `Update` | drawing only |
+| `Shutdown()` | once on exit | release GPU resources |
 
-`Render()` bekommt bewusst keine Zeit: Alles, was sich bewegt, wird in `Update`
-oder `FixedUpdate` berechnet und in `Render` nur noch gezeichnet. Die
-OpenTK-Callbacks (`OnUpdateFrame`, `OnRenderFrame` usw.) sind versiegelt.
-Holt `FixedUpdate` nach einem Ruckler mehr als fünf Schritte nach, wird die
-restliche Zeit verworfen.
+`Render()` deliberately receives no time: everything that moves is calculated in
+`Update` or `FixedUpdate`, and `Render` only draws it. The OpenTK callbacks
+(`OnUpdateFrame`, `OnRenderFrame`, etc.) are sealed. If `FixedUpdate` would have
+to catch up more than five steps after a stutter, the remaining time is discarded.
 
-## Starten
+## Running
 
-Voraussetzungen: .NET 10 SDK, ein OpenGL-3.3-fähiger Grafiktreiber und beim
-ersten Build Zugriff auf NuGet.
+Requirements: .NET 10 SDK, a graphics driver supporting OpenGL 3.3 and NuGet
+access for the first build.
 
 ```powershell
 dotnet build CgiMin.sln
 dotnet run --project Example/Example.csproj
 ```
 
-In Visual Studio Code den **Repo-Ordner** öffnen und als vertrauenswürdig
-bestätigen. `Ctrl+Shift+B` baut beide Projekte; mit `F5` und der Konfiguration
-„Example (OpenTK)“ startet der Würfel. `Engine` ist eine Library und wird nicht
-eigenständig ausgeführt.
+In Visual Studio Code, open the **repository folder** and confirm that you trust
+it. `Ctrl+Shift+B` builds both projects; `F5` with the configuration
+"Example (OpenTK)" starts the example. `Engine` is a library and is not run on
+its own.

@@ -8,6 +8,6 @@ uniform vec3 uTint;
 
 void main()
 {
-    // Vorerst ohne Farbraumumrechnung: der Texturwert wird direkt ausgegeben.
+    // No color space conversion for now: the texture value is written out directly.
     outColor = vec4(texture(uTexture, uv).rgb * uTint, 1.0);
 }

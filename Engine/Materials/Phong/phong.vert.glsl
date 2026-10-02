@@ -12,7 +12,7 @@ out vec3 worldNormal;
 
 void main()
 {
-    // OpenTK verwendet Zeilenvektoren; die Matrizen werden entsprechend geladen.
+    // OpenTK uses row vectors; the matrices are uploaded accordingly.
     worldPosition = (vec4(localPosition, 1.0) * uModel).xyz;
     worldNormal = normalize(localNormal * transpose(inverse(mat3(uModel))));
     gl_Position = vec4(localPosition, 1.0) * uModel * uView * uProjection;

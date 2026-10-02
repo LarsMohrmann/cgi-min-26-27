@@ -3,9 +3,9 @@ using OpenTK.Mathematics;
 
 namespace Engine.Materials.WaveDistortion;
 
-// Verschiebt die Vertices im Vertex-Shader entlang einer Sinuswelle und zeigt eine Textur ohne Beleuchtung.
-// Wobble ist die Phase der Welle: Wird sie in Update erhöht, läuft die Welle über das Mesh.
-// Sichtbar wird die Welle nur, wenn das Mesh entlang der x-Achse genug Vertices hat.
+// Displaces the vertices along a sine wave in the vertex shader and displays a texture without lighting.
+// Wobble is the phase of the wave: if it is increased in Update, the wave travels across the mesh.
+// The wave only becomes visible if the mesh has enough vertices along the x axis.
 public sealed class WaveDistortionMaterial : Material
 {
     private static readonly ShaderSource Source =
@@ -24,10 +24,10 @@ public sealed class WaveDistortionMaterial : Material
         set => _texture = value ?? throw new ArgumentNullException(nameof(value));
     }
 
-    // Wird mit der Texturfarbe multipliziert; Weiß lässt die Textur unverändert.
+    // Multiplied by the texture color; white leaves the texture unchanged.
     public Vector3 Tint { get; set; } = Vector3.One;
 
-    // Phase der Sinuswelle im Bogenmaß.
+    // Phase of the sine wave in radians.
     public float Wobble { get; set; }
 
     protected internal override ShaderSource ShaderSource => Source;

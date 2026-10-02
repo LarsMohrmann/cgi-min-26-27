@@ -3,7 +3,7 @@ using OpenTK.Mathematics;
 
 namespace Engine.OpenGL;
 
-// Kompiliert zwei GLSL-Quelltexte, linkt das Programm und stellt Uniform-Helfer bereit.
+// Compiles two GLSL sources, links the program and provides uniform helpers.
 public sealed class ShaderProgram : IDisposable
 {
     private readonly Dictionary<string, int> _uniformLocations = new();
@@ -30,7 +30,7 @@ public sealed class ShaderProgram : IDisposable
             GL.LinkProgram(program);
             GL.GetProgram(program, GetProgramParameterName.LinkStatus, out int success);
             if (success == 0)
-                throw new InvalidOperationException($"Shader-Linker ({name}): {GL.GetProgramInfoLog(program)}");
+                throw new InvalidOperationException($"Shader linker ({name}): {GL.GetProgramInfoLog(program)}");
 
             return new ShaderProgram(program, name);
         }
@@ -56,7 +56,7 @@ public sealed class ShaderProgram : IDisposable
 
     public void SetMatrix4(string name, Matrix4 value)
     {
-        // OpenTK-Matrizen und die Shader-Reihenfolge unten verwenden Zeilenvektoren.
+        // OpenTK matrices and the multiplication order in the shaders use row vectors.
         GL.UniformMatrix4(GetUniformLocation(name), true, ref value);
     }
 
@@ -66,7 +66,7 @@ public sealed class ShaderProgram : IDisposable
     public void SetFloat(string name, float value) =>
         GL.Uniform1(GetUniformLocation(name), value);
 
-    // Bindet die Textur an eine Texture Unit und teilt dem Sampler-Uniform deren Nummer mit.
+    // Binds the texture to a texture unit and passes the unit number to the sampler uniform.
     public void SetTexture(string name, Texture texture, int unit)
     {
         ArgumentNullException.ThrowIfNull(texture);
@@ -81,11 +81,11 @@ public sealed class ShaderProgram : IDisposable
     {
         int location = FindUniformLocation(name);
         if (location < 0)
-            throw new InvalidOperationException($"Uniform '{name}' fehlt in {_name} oder wird vom Shader nicht verwendet.");
+            throw new InvalidOperationException($"Uniform '{name}' is missing in {_name} or not used by the shader.");
         return location;
     }
 
-    // Merkt sich auch fehlende Uniforms (-1), damit HasUniform nicht jedes Mal OpenGL fragt.
+    // Also caches missing uniforms (-1) so that HasUniform does not query OpenGL every time.
     private int FindUniformLocation(string name)
     {
         ThrowIfDisposed();

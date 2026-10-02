@@ -2,10 +2,10 @@ using OpenTK.Mathematics;
 
 namespace Engine.Geometry;
 
-// Erzeugt einfache Grundkörper als MeshData. Dreiecke sind gegen den Uhrzeigersinn orientiert.
+// Creates simple primitive shapes as MeshData. Triangles are oriented counter-clockwise.
 public static class Primitives
 {
-    // Würfel um den Ursprung; jede Seite hat eigene Vertices, damit die Normalen hart bleiben.
+    // Cube around the origin; every side has its own vertices so that the normals stay hard.
     public static MeshData CreateCube(float size = 2.0f)
     {
         if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
@@ -16,7 +16,7 @@ public static class Primitives
             new(-h, -h, -h), new(h, -h, -h), new(h, h, -h), new(-h, h, -h),
             new(-h, -h, h), new(h, -h, h), new(h, h, h), new(-h, h, h)
         ];
-        // Pro Seite vier Ecken gegen den Uhrzeigersinn, von außen betrachtet.
+        // Four corners per side, counter-clockwise when viewed from outside.
         (int[] Corners, Vector3 Normal)[] faces =
         [
             ([4, 5, 6, 7], Vector3.UnitZ),

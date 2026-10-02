@@ -4,8 +4,8 @@ using OpenTK.Mathematics;
 
 namespace Engine.OpenGL;
 
-// Nur hier wird entschieden, wie Mesh, Material und Kamera zusammen gezeichnet werden.
-// Der Renderer kompiliert jeden Material-Shader beim ersten Gebrauch und gibt ihn in Dispose frei.
+// Only here is it decided how mesh, material and camera are drawn together.
+// The renderer compiles each material shader on first use and releases it in Dispose.
 public sealed class OpenGlRenderer : IDisposable
 {
     private readonly Dictionary<ShaderSource, ShaderProgram> _shaders = new();

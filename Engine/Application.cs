@@ -3,12 +3,12 @@ using OpenTK.Windowing.Desktop;
 
 namespace Engine;
 
-// Basisklasse für Anwendungen: trennt die Logik (FixedUpdate, Update) vom Zeichnen (Render).
-// Ablauf pro Frame: 0..n × FixedUpdate, dann einmal Update, dann einmal Render.
-// Die OpenTK-Callbacks sind versiegelt, damit dieser Ablauf nicht umgangen wird.
+// Base class for applications: separates the logic (FixedUpdate, Update) from drawing (Render).
+// Sequence per frame: 0..n × FixedUpdate, then Update once, then Render once.
+// The OpenTK callbacks are sealed so that this sequence cannot be bypassed.
 public abstract class Application : GameWindow
 {
-    // Begrenzt das Nachholen nach einem Ruckler, sonst kann FixedUpdate den Frame immer weiter verzögern.
+    // Limits catching up after a stutter; otherwise FixedUpdate could delay the frame further and further.
     private const int MaxFixedStepsPerFrame = 5;
 
     private double _fixedDeltaTime = 1.0 / 50.0;
@@ -17,29 +17,29 @@ public abstract class Application : GameWindow
     protected Application(GameWindowSettings gameSettings, NativeWindowSettings windowSettings)
         : base(gameSettings, windowSettings) { }
 
-    // Schrittweite von FixedUpdate in Sekunden (Standard: 50 Schritte pro Sekunde).
+    // Time step of FixedUpdate in seconds (default: 50 steps per second).
     public double FixedDeltaTime
     {
         get => _fixedDeltaTime;
         set => _fixedDeltaTime = value > 0 ? value : throw new ArgumentOutOfRangeException(nameof(value));
     }
 
-    // Wird einmal nach dem Erzeugen des OpenGL-Kontexts aufgerufen.
+    // Called once after the OpenGL context has been created.
     protected virtual void Initialize() { }
 
-    // Wird nach Initialize und bei jeder Größenänderung des Framebuffers aufgerufen (nie mit 0).
+    // Called after Initialize and on every framebuffer resize (never with 0).
     protected virtual void FramebufferResized(int width, int height) { }
 
-    // Läuft mit fester Schrittweite, unabhängig von der Framerate. Für Physik und Simulation.
+    // Runs with a fixed time step, independent of the frame rate. For physics and simulation.
     protected virtual void FixedUpdate(float fixedDeltaTime) { }
 
-    // Läuft einmal pro Frame. deltaTime ist die Zeit seit dem letzten Frame in Sekunden.
+    // Runs once per frame. deltaTime is the time since the last frame in seconds.
     protected virtual void Update(float deltaTime) { }
 
-    // Zeichnet den aktuellen Zustand. Ändert keinen Zustand und kennt deshalb keine Zeit.
+    // Draws the current state. Does not change any state and therefore knows no time.
     protected abstract void Render();
 
-    // Wird vor dem Schließen aufgerufen, solange der OpenGL-Kontext noch existiert.
+    // Called before closing, while the OpenGL context still exists.
     protected virtual void Shutdown() { }
 
     protected sealed override void OnLoad()
@@ -69,7 +69,7 @@ public abstract class Application : GameWindow
             _fixedTimeAccumulator -= _fixedDeltaTime;
             steps++;
         }
-        // Was nach dem Limit noch übrig ist, wird verworfen: die Simulation läuft dann kurz langsamer.
+        // Whatever is left after the limit is discarded: the simulation then runs slower for a moment.
         if (_fixedTimeAccumulator >= _fixedDeltaTime)
             _fixedTimeAccumulator = 0;
 
@@ -79,7 +79,7 @@ public abstract class Application : GameWindow
     protected sealed override void OnRenderFrame(FrameEventArgs e)
     {
         base.OnRenderFrame(e);
-        // Ein minimiertes Fenster hat keinen Framebuffer, in den gezeichnet werden kann.
+        // A minimized window has no framebuffer that could be drawn into.
         if (FramebufferSize.X == 0 || FramebufferSize.Y == 0) return;
 
         Render();

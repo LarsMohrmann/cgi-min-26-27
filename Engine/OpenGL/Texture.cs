@@ -3,8 +3,8 @@ using StbImageSharp;
 
 namespace Engine.OpenGL;
 
-// 2D-Textur auf der GPU. Die Pixelwerte werden unverändert gespeichert (RGBA, 8 Bit pro Kanal);
-// eine Farbraumumrechnung (sRGB/Gamma) findet vorerst nicht statt.
+// 2D texture on the GPU. The pixel values are stored unchanged (RGBA, 8 bits per channel);
+// there is no color space conversion (sRGB/gamma) for now.
 public sealed class Texture : IDisposable
 {
     private int _handle;
@@ -37,8 +37,8 @@ public sealed class Texture : IDisposable
         GL.BindTexture(TextureTarget.Texture2D, 0);
     }
 
-    // Lädt PNG, JPG, BMP, TGA u. a. Bilddateien liegen oben links beginnend vor, OpenGL erwartet
-    // die erste Zeile unten – deshalb wird beim Laden vertikal gespiegelt.
+    // Loads PNG, JPG, BMP, TGA and more. Image files start at the top left, OpenGL expects
+    // the first row at the bottom – that is why the image is flipped vertically on load.
     public static Texture FromFile(string path)
     {
         StbImage.stbi_set_flip_vertically_on_load(1);

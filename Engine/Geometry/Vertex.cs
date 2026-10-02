@@ -3,8 +3,8 @@ using OpenTK.Mathematics;
 
 namespace Engine.Geometry;
 
-// Vertexformat aller Meshes: Position (xyz), Normale (xyz), Texturkoordinate (uv).
-// Die Feldreihenfolge bestimmt das Speicherlayout im Vertexbuffer.
+// Vertex format of all meshes: position (xyz), normal (xyz), texture coordinate (uv).
+// The field order defines the memory layout in the vertex buffer.
 [StructLayout(LayoutKind.Sequential)]
 public readonly struct Vertex
 {

@@ -18,7 +18,7 @@ internal static class Program
         var windowSettings = new NativeWindowSettings
         {
             ClientSize = new Vector2i(960, 720),
-            Title = "OpenTK — texturiertes Modell",
+            Title = "OpenTK — textured model",
             APIVersion = new Version(3, 3),
             Profile = ContextProfile.Core
         };
@@ -57,18 +57,18 @@ internal sealed class CubeWindow : Application
 
     protected override void FramebufferResized(int width, int height) => _renderer!.Resize(width, height);
 
-    // Die Animation ändert nur den Zustand; gezeichnet wird ausschließlich in Render.
+    // The animation only changes the state; drawing happens exclusively in Render.
     protected override void Update(float deltaTime)
     {
         _elapsedTime += deltaTime;
         _model = Matrix4.CreateRotationX(_elapsedTime * 0.43f)
                * Matrix4.CreateRotationY(_elapsedTime * 0.7f);
+        _material!.Wobble = _elapsedTime * 5;
     }
 
     protected override void Render()
     {
         _renderer!.Clear();
-        _material!.Wobble = _elapsedTime * 5;
         _renderer.Draw(_mesh!, _material!, _model, _camera!);
     }
 

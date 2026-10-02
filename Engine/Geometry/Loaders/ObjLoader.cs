@@ -3,12 +3,12 @@ using OpenTK.Mathematics;
 
 namespace Engine.Geometry.Loaders;
 
-// Liest die Geometrie aus Wavefront-.obj-Dateien und liefert indizierte MeshData.
+// Reads the geometry from Wavefront .obj files and returns indexed MeshData.
 //
-// Unterstützt: v, vt, vn und f in allen vier Formen (v, v/vt, v//vn, v/vt/vn),
-// Polygone mit mehr als drei Ecken (werden als Fächer trianguliert) und negative Indizes.
-// Ignoriert: Materialien (mtllib, usemtl), Objekte und Gruppen (o, g), Smoothing Groups (s),
-// Linien und Punkte. Alle Objekte einer Datei landen in einem gemeinsamen Mesh.
+// Supported: v, vt, vn and f in all four forms (v, v/vt, v//vn, v/vt/vn),
+// polygons with more than three corners (triangulated as a fan) and negative indices.
+// Ignored: materials (mtllib, usemtl), objects and groups (o, g), smoothing groups (s),
+// lines and points. All objects of a file end up in one common mesh.
 public static class ObjLoader
 {
     private const int Missing = -1;
@@ -27,7 +27,7 @@ public static class ObjLoader
 
         var vertices = new List<Vertex>();
         var indices = new List<uint>();
-        // Gleiche Kombinationen aus Position, UV und Normale werden nur einmal als Vertex angelegt.
+        // Identical combinations of position, UV and normal are created only once as a vertex.
         var vertexLookup = new Dictionary<(int Position, int TexCoord, int Normal), uint>();
 
         int lineNumber = 0;
@@ -46,7 +46,7 @@ public static class ObjLoader
                         positions.Add(ParseVector3(parts));
                         break;
                     case "vt":
-                        // V ist optional; der Ursprung liegt wie in OpenGL unten links.
+                        // V is optional; the origin is at the bottom left, as in OpenGL.
                         texCoords.Add(new Vector2(ParseFloat(parts, 1), parts.Length > 2 ? ParseFloat(parts, 2) : 0));
                         break;
                     case "vn":
@@ -64,20 +64,20 @@ public static class ObjLoader
         }
 
         if (indices.Count == 0)
-            throw new FormatException($"{fileName}: Die Datei enthält keine Flächen (f-Zeilen).");
+            throw new FormatException($"{fileName}: The file contains no faces (f lines).");
 
         return new MeshData(vertices.ToArray(), indices.ToArray());
 
         void AddFace(string[] parts)
         {
             if (parts.Length < 4)
-                throw new FormatException("Eine Fläche braucht mindestens drei Ecken.");
+                throw new FormatException("A face needs at least three corners.");
 
             var corners = new (int Position, int TexCoord, int Normal)[parts.Length - 1];
             for (int i = 0; i < corners.Length; i++)
                 corners[i] = ParseCorner(parts[i + 1]);
 
-            // Fächer-Triangulierung: (0, 1, 2), (0, 2, 3), (0, 3, 4) …
+            // Fan triangulation: (0, 1, 2), (0, 2, 3), (0, 3, 4) …
             for (int i = 1; i < corners.Length - 1; i++)
             {
                 var a = corners[0];
@@ -92,21 +92,21 @@ public static class ObjLoader
 
         (int, int, int) ParseCorner(string corner)
         {
-            // "1", "1/2", "1//3" oder "1/2/3" – leere Felder bedeuten: nicht vorhanden.
+            // "1", "1/2", "1//3" or "1/2/3" – empty fields mean: not present.
             string[] fields = corner.Split('/');
             if (fields.Length > 3)
-                throw new FormatException($"Ungültige Ecke '{corner}'.");
+                throw new FormatException($"Invalid corner '{corner}'.");
 
-            int position = ResolveIndex(fields[0], positions.Count, "Positions");
+            int position = ResolveIndex(fields[0], positions.Count, "Position");
             int texCoord = fields.Length > 1 && fields[1] != "" ? ResolveIndex(fields[1], texCoords.Count, "UV") : Missing;
-            int normal = fields.Length > 2 && fields[2] != "" ? ResolveIndex(fields[2], normals.Count, "Normalen") : Missing;
+            int normal = fields.Length > 2 && fields[2] != "" ? ResolveIndex(fields[2], normals.Count, "Normal") : Missing;
             return (position, texCoord, normal);
         }
 
         uint GetVertex((int Position, int TexCoord, int Normal) corner, Vector3 faceNormal)
         {
-            // Ohne Normale aus der Datei bekommt jedes Dreieck eine eigene, flache Normale.
-            // Solche Ecken dürfen deshalb nicht mit Ecken anderer Dreiecke zusammengelegt werden.
+            // Without a normal from the file, every triangle gets its own flat normal.
+            // Such corners must therefore not be merged with corners of other triangles.
             bool shareable = corner.Normal != Missing;
             if (shareable && vertexLookup.TryGetValue(corner, out uint existing)) return existing;
 
@@ -121,15 +121,15 @@ public static class ObjLoader
         }
     }
 
-    // OBJ-Indizes beginnen bei 1; negative Werte zählen vom zuletzt gelesenen Eintrag rückwärts.
+    // OBJ indices start at 1; negative values count backwards from the last entry read.
     private static int ResolveIndex(string field, int count, string kind)
     {
         if (!int.TryParse(field, NumberStyles.Integer, CultureInfo.InvariantCulture, out int index) || index == 0)
-            throw new FormatException($"Ungültiger {kind}-Index '{field}'.");
+            throw new FormatException($"Invalid {kind} index '{field}'.");
 
         int resolved = index > 0 ? index - 1 : count + index;
         if (resolved < 0 || resolved >= count)
-            throw new FormatException($"{kind}-Index {index} verweist auf keinen der {count} bisher gelesenen Einträge.");
+            throw new FormatException($"{kind} index {index} does not refer to any of the {count} entries read so far.");
         return resolved;
     }
 
@@ -139,16 +139,16 @@ public static class ObjLoader
     private static float ParseFloat(string[] parts, int index)
     {
         if (index >= parts.Length)
-            throw new FormatException($"'{parts[0]}' braucht mindestens {index} Zahlenwerte.");
+            throw new FormatException($"'{parts[0]}' needs at least {index} numeric values.");
         if (!float.TryParse(parts[index], NumberStyles.Float, CultureInfo.InvariantCulture, out float value))
-            throw new FormatException($"'{parts[index]}' ist keine gültige Zahl.");
+            throw new FormatException($"'{parts[index]}' is not a valid number.");
         return value;
     }
 
     private static Vector3 FaceNormal(Vector3 a, Vector3 b, Vector3 c) =>
         SafeNormalize(Vector3.Cross(b - a, c - a));
 
-    // Ein Nullvektor (z. B. von einem entarteten Dreieck) hat keine Richtung und bleibt Null statt NaN.
+    // A zero vector (e.g. from a degenerate triangle) has no direction and stays zero instead of NaN.
     private static Vector3 SafeNormalize(Vector3 v) =>
         v.LengthSquared > 0 ? v.Normalized() : Vector3.Zero;
 }

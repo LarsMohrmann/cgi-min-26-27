@@ -1,7 +1,7 @@
 namespace Engine.Geometry;
 
-// Indizierte Dreiecksgeometrie im Hauptspeicher, ohne OpenGL-Zustand.
-// Primitive und Modell-Loader erzeugen MeshData; erst Mesh lädt sie auf die GPU.
+// Indexed triangle geometry in main memory, without OpenGL state.
+// Primitives and model loaders create MeshData; only Mesh uploads it to the GPU.
 public sealed class MeshData
 {
     public Vertex[] Vertices { get; }
@@ -12,13 +12,13 @@ public sealed class MeshData
         ArgumentNullException.ThrowIfNull(vertices);
         ArgumentNullException.ThrowIfNull(indices);
         if (vertices.Length == 0)
-            throw new ArgumentException("Mindestens ein Vertex wird benötigt.", nameof(vertices));
+            throw new ArgumentException("At least one vertex is required.", nameof(vertices));
         if (indices.Length == 0 || indices.Length % 3 != 0)
-            throw new ArgumentException("Pro Dreieck werden drei Indizes benötigt.", nameof(indices));
+            throw new ArgumentException("Each triangle requires three indices.", nameof(indices));
         foreach (uint index in indices)
         {
             if (index >= vertices.Length)
-                throw new ArgumentOutOfRangeException(nameof(indices), $"Index {index} verweist auf keinen der {vertices.Length} Vertices.");
+                throw new ArgumentOutOfRangeException(nameof(indices), $"Index {index} does not refer to any of the {vertices.Length} vertices.");
         }
 
         Vertices = vertices;

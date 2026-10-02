@@ -3,7 +3,7 @@ using OpenTK.Mathematics;
 
 namespace Engine.Materials.UnlitTexture;
 
-// Zeigt eine Textur ohne Beleuchtung an, optional mit einer Farbe multipliziert.
+// Displays a texture without lighting, optionally multiplied by a color.
 public sealed class UnlitTextureMaterial : Material
 {
     private static readonly ShaderSource Source =
@@ -22,7 +22,7 @@ public sealed class UnlitTextureMaterial : Material
         set => _texture = value ?? throw new ArgumentNullException(nameof(value));
     }
 
-    // Wird mit der Texturfarbe multipliziert; Weiß lässt die Textur unverändert.
+    // Multiplied by the texture color; white leaves the texture unchanged.
     public Vector3 Tint { get; set; } = Vector3.One;
 
     protected internal override ShaderSource ShaderSource => Source;

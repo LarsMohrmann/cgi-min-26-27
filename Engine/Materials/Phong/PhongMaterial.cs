@@ -3,7 +3,7 @@ using OpenTK.Mathematics;
 
 namespace Engine.Materials.Phong;
 
-// Ambient-, Diffuse- und Specular-Beleuchtung nach Phong mit einer Punktlichtquelle.
+// Ambient, diffuse and specular lighting according to Phong with one point light.
 public sealed class PhongMaterial : Material
 {
     private static readonly ShaderSource Source =

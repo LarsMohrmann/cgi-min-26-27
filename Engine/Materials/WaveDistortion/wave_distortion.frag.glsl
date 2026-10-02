@@ -8,6 +8,6 @@ uniform vec3 uTint;
 
 void main()
 {
-    // Wie beim UnlitTexture-Material: der Texturwert wird direkt ausgegeben.
+    // As in the UnlitTexture material: the texture value is written out directly.
     outColor = vec4(texture(uTexture, uv).rgb * uTint, 1.0);
 }

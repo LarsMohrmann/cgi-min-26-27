@@ -23,6 +23,6 @@ void main()
     vec3 specular = vec3(uSpecularStrength) * pow(max(dot(R, V), 0.0), uShininess)
                     * step(0.0, dot(N, L));
 
-    // Vorerst ohne Gamma-Korrektur: das Ergebnis wird direkt ausgegeben.
+    // No gamma correction for now: the result is written out directly.
     outColor = vec4(ambient + diffuse + specular, 1.0);
 }

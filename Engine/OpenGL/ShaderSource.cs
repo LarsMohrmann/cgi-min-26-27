@@ -2,8 +2,8 @@ using System.Reflection;
 
 namespace Engine.OpenGL;
 
-// Beschreibt, woher die GLSL-Quelltexte eines Shaders kommen. Kompiliert wird erst im Renderer,
-// weil dafür ein OpenGL-Kontext nötig ist. Eine Instanz pro Materialtyp genügt.
+// Describes where the GLSL sources of a shader come from. Compilation happens in the renderer,
+// because it requires an OpenGL context. One instance per material type is enough.
 public sealed class ShaderSource
 {
     private readonly Assembly _assembly;
@@ -20,8 +20,8 @@ public sealed class ShaderSource
         Name = name;
     }
 
-    // Die GLSL-Dateien liegen im Ordner, der dem Namespace von 'anchor' entspricht,
-    // und werden als EmbeddedResource in dessen Assembly eingebettet.
+    // The GLSL files are located in the folder matching the namespace of 'anchor'
+    // and are embedded into its assembly as EmbeddedResource.
     public static ShaderSource FromEmbeddedResources(Type anchor, string vertexFile, string fragmentFile)
     {
         ArgumentNullException.ThrowIfNull(anchor);
@@ -37,7 +37,7 @@ public sealed class ShaderSource
         using Stream? stream = _assembly.GetManifestResourceStream(resourceName);
         if (stream is null)
             throw new FileNotFoundException(
-                $"Eingebetteter Shader '{resourceName}' fehlt. Vorhanden: {string.Join(", ", _assembly.GetManifestResourceNames())}");
+                $"Embedded shader '{resourceName}' is missing. Available: {string.Join(", ", _assembly.GetManifestResourceNames())}");
 
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();

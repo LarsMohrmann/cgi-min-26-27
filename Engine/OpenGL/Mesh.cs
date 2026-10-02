@@ -4,8 +4,8 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace Engine.OpenGL;
 
-// GPU-Kopie einer MeshData: Vertexbuffer, Indexbuffer und das zugehörige Vertex Array Object.
-// Attribut-Locations: 0 = Position, 1 = Normale, 2 = Texturkoordinate.
+// GPU copy of a MeshData: vertex buffer, index buffer and the matching vertex array object.
+// Attribute locations: 0 = position, 1 = normal, 2 = texture coordinate.
 public sealed class Mesh : IDisposable
 {
     private int _vertexArray;
@@ -27,7 +27,7 @@ public sealed class Mesh : IDisposable
         GL.BindVertexArray(_vertexArray);
         GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer);
         GL.BufferData(BufferTarget.ArrayBuffer, data.Vertices.Length * Marshal.SizeOf<Vertex>(), data.Vertices, BufferUsageHint.StaticDraw);
-        // Der Indexbuffer wird im VAO gespeichert und darf deshalb nicht vor dem VAO gelöst werden.
+        // The index buffer is stored in the VAO and therefore must not be unbound before the VAO.
         GL.BindBuffer(BufferTarget.ElementArrayBuffer, _indexBuffer);
         GL.BufferData(BufferTarget.ElementArrayBuffer, data.Indices.Length * sizeof(uint), data.Indices, BufferUsageHint.StaticDraw);
 
