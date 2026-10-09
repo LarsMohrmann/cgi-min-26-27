@@ -13,5 +13,6 @@
 
   <ItemGroup>
     <None Update="Assets\**" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="Materials\**\*.glsl" />
   </ItemGroup>
 </Project>

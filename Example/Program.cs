@@ -6,6 +6,7 @@ using Engine.Materials.ReflectionMapping;
 using Engine.Materials.UnlitTexture;
 using Engine.Materials.WaveDistortion;
 using Engine.OpenGL;
+using Example.Materials.NormalColor;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -55,6 +56,7 @@ internal sealed class CubeWindow : Application
         // _material = new UnlitTextureMaterial(_texture);
         // _material = new WaveDistortionMaterial(_texture);
         _material = new ReflectionMappingMaterial(_texture);
+        // _material = new NormalColorMaterial();   // own material in this project, see Materials/NormalColor
 
         // _mesh = new Mesh(Primitives.CreateCube());
         // _mesh = new Mesh(ObjLoader.Load(Path.Combine(AppContext.BaseDirectory, "Assets", "star.obj")));

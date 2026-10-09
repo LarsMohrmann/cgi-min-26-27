@@ -25,8 +25,20 @@ public sealed class ShaderSource
     public static ShaderSource FromEmbeddedResources(Type anchor, string vertexFile, string fragmentFile)
     {
         ArgumentNullException.ThrowIfNull(anchor);
-        string prefix = anchor.Namespace is null ? "" : anchor.Namespace + ".";
-        return new ShaderSource(anchor.Assembly, prefix + vertexFile, prefix + fragmentFile, anchor.Name);
+        return new ShaderSource(anchor.Assembly,
+            ResolveResourceName(anchor, vertexFile), ResolveResourceName(anchor, fragmentFile), anchor.Name);
+    }
+
+    private static string ResolveResourceName(Type anchor, string file)
+    {
+        string expected = anchor.Namespace is null ? file : anchor.Namespace + "." + file;
+        string[] names = anchor.Assembly.GetManifestResourceNames();
+        if (names.Contains(expected)) return expected;
+
+        // The resource name is built from the project's root namespace and the folder. If the code's
+        // namespace differs (e.g. after copying and renaming a project), fall back to a unique file name.
+        string[] matches = names.Where(n => n.EndsWith("." + file, StringComparison.Ordinal)).ToArray();
+        return matches.Length == 1 ? matches[0] : expected;
     }
 
     internal ShaderProgram Compile() =>

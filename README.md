@@ -78,3 +78,40 @@ In Visual Studio Code, open the **repository folder** and confirm that you trust
 it. `Ctrl+Shift+B` builds both projects; `F5` with the configuration
 "Example (OpenTK)" starts the example. `Engine` is a library and is not run on
 its own.
+
+## Your own project
+
+Do not work in the course repository. Clone it once, keep it as `upstream` and
+push your work to your own Git repository:
+
+```bash
+git clone https://github.com/LarsMohrmann/cgi-min-26-27.git MyGame
+cd MyGame
+git remote rename origin upstream
+git remote add origin https://github.com/<your-name>/<your-game>.git
+git push -u origin main
+```
+
+Create your game as a copy of the example and leave `Example/` unchanged:
+
+1. Copy the folder `Example/` to `MyGame/` and rename `Example.csproj` to `MyGame.csproj`.
+2. Add it to the solution: `dotnet sln CgiMin.sln add MyGame/MyGame.csproj`
+3. Run it: `dotnet run --project MyGame` (for `F5`, change the path in
+   `.vscode/launch.json` to `MyGame/bin/Debug/net10.0/MyGame.dll`).
+
+### Engine updates
+
+The engine grows with every lecture. Each lecture state is tagged (`lecture-03`,
+`lecture-04`, …), see [CHANGELOG.md](CHANGELOG.md). Update to a tagged state on
+purpose, not just to the newest commit:
+
+```bash
+git fetch upstream --tags
+git merge --no-edit lecture-05
+```
+
+Treat `Engine/` as read-only: if you do not change engine files, updates merge
+without conflicts. Extend the engine in your own project instead. For example,
+write your own material like `Example/Materials/NormalColor`: derive from
+`Engine.Materials.Material`, put the `.glsl` files next to the class and embed
+them with `<EmbeddedResource Include="Materials\**\*.glsl" />` in your `.csproj`.
