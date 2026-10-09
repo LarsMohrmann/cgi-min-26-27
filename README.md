@@ -115,3 +115,10 @@ without conflicts. Extend the engine in your own project instead. For example,
 write your own material like `Example/Materials/NormalColor`: derive from
 `Engine.Materials.Material`, put the `.glsl` files next to the class and embed
 them with `<EmbeddedResource Include="Materials\**\*.glsl" />` in your `.csproj`.
+
+Want to add something to the engine itself? Contributions are welcome as pull
+requests, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+The code is licensed under the [MIT License](LICENSE).
