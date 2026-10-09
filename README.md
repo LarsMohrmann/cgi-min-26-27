@@ -1,8 +1,8 @@
 # CGI-MIN 26/27
 
-A small starting point for computer graphics with C# and OpenTK: a rotating,
-textured model without lighting. The engine also contains a wave distortion
-material and a Phong material with ambient, diffuse and specular lighting.
+A small starting point for computer graphics with C# and OpenTK: a rotating
+model with reflection mapping. The engine also contains materials for plain
+texturing, wave distortion and Phong lighting (ambient, diffuse and specular).
 
 ## Structure
 
@@ -13,8 +13,10 @@ material and a Phong material with ambient, diffuse and specular lighting.
 - `Engine/Materials/` contains the abstract base class `Material` and one
   subfolder per material type with its class and GLSL files: `UnlitTexture/`
   (texture without lighting), `WaveDistortion/` (texture without lighting,
-  vertices displaced by a sine wave; the phase `Wobble` is increased in `Update`)
-  and `Phong/` (single color with lighting). The shaders are embedded into
+  vertices displaced by a sine wave; the phase `Wobble` is increased in `Update`),
+  `ReflectionMapping/` (texture coordinates calculated from the normal in view
+  space, so an environment texture appears reflected on the surface) and `Phong/`
+  (single color with lighting). The shaders are embedded into
   `Engine.dll` as `EmbeddedResource`.
 - `Engine/Geometry/` contains geometry in main memory, without OpenGL: `Vertex`
   (position, normal, texture coordinate), `MeshData` (vertices and triangle
@@ -27,11 +29,13 @@ material and a Phong material with ambient, diffuse and specular lighting.
   `OpenGlRenderer` (OpenGL state, shader management and draw call).
 - `Example/` is the executable OpenTK application and references `Engine`.
   Images and other files in `Example/Assets/` are copied next to the application
-  during the build; the texture is loaded from `Assets/wood_box.png`.
+  during the build.
 - `CgiMin.sln` loads both projects together.
 
-The example loads the star from `Assets/star.obj` with `ObjLoader` (alternatively,
-commented out, the cube from `Primitives.CreateCube()`) and draws it with
+The example loads the duck from `Assets/duck_smooth.obj` with `ObjLoader` and
+draws it with the `ReflectionMappingMaterial` and `Assets/environment.png`. The
+other textures, materials and meshes (cube, star, flat-shaded duck) are commented
+out in `Initialize` and can be switched quickly. The mesh is drawn with
 `renderer.Draw(mesh, material, modelMatrix, camera)`. The animation only changes
 the model matrix; the camera is not a global static class. Materials and cameras
 do not draw themselves. A scene model will follow in a later step.

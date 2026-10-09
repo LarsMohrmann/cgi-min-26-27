@@ -2,6 +2,7 @@ using Engine;
 using Engine.Geometry;
 using Engine.Geometry.Loaders;
 using Engine.Materials;
+using Engine.Materials.ReflectionMapping;
 using Engine.Materials.UnlitTexture;
 using Engine.Materials.WaveDistortion;
 using Engine.OpenGL;
@@ -34,7 +35,7 @@ internal sealed class CubeWindow : Application
     private Camera? _camera;
     private Mesh? _mesh;
     private Texture? _texture;
-    private WaveDistortionMaterial? _material;
+    private Material? _material;
     private float _elapsedTime;
     private Matrix4 _model = Matrix4.Identity;
 
@@ -45,14 +46,20 @@ internal sealed class CubeWindow : Application
     {
         VSync = VSyncMode.On;
         _renderer = new OpenGlRenderer();
-        _camera = new Camera(new Vector3(0, 0, 5), Vector3.Zero);
-        _texture = Texture.FromFile(Path.Combine(AppContext.BaseDirectory, "Assets", "wood_box.png"));
+        _camera = new Camera(new Vector3(0, 0, 8), Vector3.Zero);
 
-        //_material = new UnlitTextureMaterial(_texture);
-        _material = new WaveDistortionMaterial(_texture);
+        // To switch, comment out the active line and uncomment another one.
+        // _texture = Texture.FromFile(Path.Combine(AppContext.BaseDirectory, "Assets", "wood_box.png"));
+        _texture = Texture.FromFile(Path.Combine(AppContext.BaseDirectory, "Assets", "environment.png"));
+
+        // _material = new UnlitTextureMaterial(_texture);
+        // _material = new WaveDistortionMaterial(_texture);
+        _material = new ReflectionMappingMaterial(_texture);
 
         // _mesh = new Mesh(Primitives.CreateCube());
-        _mesh = new Mesh(ObjLoader.Load(Path.Combine(AppContext.BaseDirectory, "Assets", "star.obj")));
+        // _mesh = new Mesh(ObjLoader.Load(Path.Combine(AppContext.BaseDirectory, "Assets", "star.obj")));
+        // _mesh = new Mesh(ObjLoader.Load(Path.Combine(AppContext.BaseDirectory, "Assets", "duck_flat.obj")));
+        _mesh = new Mesh(ObjLoader.Load(Path.Combine(AppContext.BaseDirectory, "Assets", "duck_smooth.obj")));
     }
 
     protected override void FramebufferResized(int width, int height) => _renderer!.Resize(width, height);
@@ -63,7 +70,8 @@ internal sealed class CubeWindow : Application
         _elapsedTime += deltaTime;
         _model = Matrix4.CreateRotationX(_elapsedTime * 0.43f)
                * Matrix4.CreateRotationY(_elapsedTime * 0.7f);
-        _material!.Wobble = _elapsedTime * 5;
+        if (_material is WaveDistortionMaterial wave)
+            wave.Wobble = _elapsedTime * 5;
     }
 
     protected override void Render()
