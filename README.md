@@ -107,7 +107,7 @@ purpose, not just to the newest commit:
 
 ```bash
 git fetch upstream --tags
-git merge --no-edit lecture-05
+git merge --no-edit lecture-03
 ```
 
 Treat `Engine/` as read-only: if you do not change engine files, updates merge
