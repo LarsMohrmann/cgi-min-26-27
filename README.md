@@ -18,7 +18,8 @@ reflection mapping.
   `ReflectionMapping/` (texture coordinates calculated from the normal in view
   space, so an environment texture appears reflected on the surface) and
   `AmbientDiffuseSpecular/` (texture lit by a directional light: ambient, diffuse
-  and specular with the halfway vector, Blinn-Phong). The shaders are embedded into
+  and specular with the halfway vector, Blinn-Phong) and `LitTexture/` (texture
+  with Phong lighting using the reflection vector, contributed by a student). The shaders are embedded into
   `Engine.dll` as `EmbeddedResource`.
 - `Engine/Geometry/` contains geometry in main memory, without OpenGL: `Vertex`
   (position, normal, texture coordinate), `MeshData` (vertices and triangle

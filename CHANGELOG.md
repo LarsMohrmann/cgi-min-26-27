@@ -12,6 +12,9 @@ Changes that can break your own code are marked with **Breaking**.
   (ambient + diffuse + specular with the halfway vector, Blinn-Phong) and a `Shininess`.
 - Example: the duck is drawn with `AmbientDiffuseSpecularMaterial` and the new
   `Assets/duck_texture.png`; the light is set in `Initialize`.
+- New (pull request #1, thanks to Linus Parbel): `LitTextureMaterial` – texture with Phong
+  lighting (reflection vector), plus `monkey.obj`, `monkey-smooth.obj` and `monkey.png`.
+  It uses the directional light (`uLightDirection`) instead of the former `uLightPosition`.
 - **Breaking:** `PhongMaterial` was removed, use `AmbientDiffuseSpecularMaterial`
   (it needs a texture).
 - **Breaking:** `OpenGlRenderer.LightPosition` and the `uLightPosition` uniform were
