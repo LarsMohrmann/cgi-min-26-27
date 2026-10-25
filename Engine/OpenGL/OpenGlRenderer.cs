@@ -57,6 +57,9 @@ public sealed class OpenGlRenderer : IDisposable
         GL.BindVertexArray(mesh.VertexArray);
         GL.DrawElements(PrimitiveType.Triangles, mesh.IndexCount, DrawElementsType.UnsignedInt, 0);
         GL.BindVertexArray(0);
+
+        // Materials with several textures switch the active texture unit; reset it for the next draw call.
+        GL.ActiveTexture(TextureUnit.Texture0);
     }
 
     // Only shaders that use lighting declare these uniforms; all others are left untouched.
